@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -13,6 +13,12 @@ export default function Navbar() {
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Keep the search box in sync with the URL — so clearing the query
+  // (e.g. via the logo, browser back, or the clear button) also clears the input.
+  useEffect(() => {
+    setQuery(searchParams.get("q") ?? "");
+  }, [searchParams]);
+
   function handleSearch(e: FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -21,11 +27,21 @@ export default function Navbar() {
     setMenuOpen(false);
   }
 
+  function handleClearSearch() {
+    setQuery("");
+    navigate("/");
+    setMenuOpen(false);
+  }
+
   return (
     <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur border-b border-line">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
-          <Link to="/" className="flex items-center gap-2 shrink-0">
+          <Link
+            to="/"
+            onClick={() => setQuery("")}
+            className="flex items-center gap-2 shrink-0"
+          >
             <span className="font-display text-xl font-semibold tracking-tight text-ink">
               Field&Ware
             </span>
@@ -49,6 +65,18 @@ export default function Navbar() {
               <circle cx="11" cy="11" r="7" />
               <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
             </svg>
+            {query && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                aria-label="Clear search"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-inkmute hover:text-accent transition-colors"
+              >
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
+                  <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+                </svg>
+              </button>
+            )}
           </form>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -139,6 +167,18 @@ export default function Navbar() {
                 <circle cx="11" cy="11" r="7" />
                 <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
               </svg>
+              {query && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  aria-label="Clear search"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-inkmute hover:text-accent transition-colors"
+                >
+                  <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
+                    <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+                  </svg>
+                </button>
+              )}
             </form>
             {isAuthenticated ? (
               <div className="flex items-center justify-between">
